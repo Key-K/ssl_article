@@ -1,0 +1,1 @@
+V	181209120005Z		1B00000000000000	unknown	/C=RU/ST=Krasnoyarskiy kray/L=Norilsk/O=CertService/OU=CertService. IT-Department./CN=certservice.info/emailAddress=web@certservice.info/subjectAltName=DNS:certservice.info, DNS:www.certservice.info

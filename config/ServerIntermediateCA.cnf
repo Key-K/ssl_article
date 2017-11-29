@@ -1,0 +1,116 @@
+[ ca ]
+default_ca = CA_default
+
+[ CA_default ]
+# Переменные указывающие директории, нам это пригодиться в конфиге 
+# (чтоб не редактировать в ста местах)
+dir               = /root/ca/ServerIntermediateCA
+certs             = $dir/certs
+private           = $dir/private
+crl_dir           = $dir/crl
+new_certs_dir     = $dir/newcerts
+database          = $dir/index.txt
+serial            = $dir/serial
+RANDFILE          = $dir/private/.rand
+
+# Сертификат и ключ, которым будет подписан другой сертификат, 
+# проходящий через этот конфиг (в данном случае - это корневой сертификат)
+private_key       = $private/ServerIntermediateCA.key.pem
+certificate       = $certs/ServerIntermediateCA.cert.pem
+
+# Параметры для отозванных сертификатов
+crlnumber         = $dir/crlnumber
+crl               = $crl_dir/ServerIntermediateCA.crl.pem
+crl_extensions    = crl_ext
+default_crl_days  = 30
+
+# используемый алгоритм хеширования
+default_md        = sha256
+
+name_opt          = ca_default
+cert_opt          = ca_default
+default_days      = 365
+preserve          = no
+policy            = policy_intermediate_server
+
+[ policy_intermediate_server ]
+countryName = optional
+stateOrProvinceName = optional
+localityName = optional
+organizationName = match
+organizationalUnitName = optional
+commonName = supplied
+emailAddress = supplied
+subjectAltName = supplied
+
+[ req ]
+default_bits        = 2048
+distinguished_name  = req_distinguished_name
+string_mask         = utf8only
+
+default_md          = sha256
+
+# Расширение при использовании опции -x509.
+x509_extensions     = root_ca
+
+[ req_distinguished_name ]
+countryName                     = Country Name (2 letter code) (C)
+countryName_min		= 2
+countryName_max		= 2
+countryName_default          = RU
+
+stateOrProvinceName             = State or Province Name (S)
+stateOrProvinceName_default     = Krasnoyarskiy kray
+
+localityName                    = Locality Name (L)
+localityName_default            = Norilsk
+
+0.organizationName              = Organization Name (O)
+0.organizationName_default      = CertService
+
+organizationalUnitName          = Organizational Unit Name (OU)
+organizationalUnitName_default = CertService. IT-Department.
+
+commonName                      = Common Name (CN)
+#commonName_default          = CertService.info
+
+emailAddress                    = Email Address
+emailAddress_max		= 60
+#emailAddress_default          = support@CertService.info
+
+subjectAltName = Alternative DNS names (comma seperated list)
+#subjectAltName_default = DNS:www.CertService.info
+
+[ root_ca ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints = critical, CA:true
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+
+[ intermediate_ca ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints = critical, CA:true, pathlen:0
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+
+[ server_cert ]
+# Серверный
+basicConstraints = CA:FALSE
+nsCertType = server
+nsComment = "Server Certificate"
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer:always
+keyUsage = critical, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+
+[ crl_ext ]
+# Для отзыва сертификатов
+authorityKeyIdentifier=keyid:always
+
+[ ocsp ]
+# Для OCSP (Online Certificate Status Protocol)
+basicConstraints = CA:FALSE
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+keyUsage = critical, digitalSignature
+extendedKeyUsage = critical, OCSPSigning
